@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekBurguer.Ingredients", "GeekBurguer.Ingredients\GeekBurguer.Ingredients.csproj", "{1DF2D5CE-63FE-4ED2-AB89-D514DD91D0D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekBurguer.Ingredients.Contracts", "GeekBurguer.Ingredients.Contracts\GeekBurguer.Ingredients.Contracts.csproj", "{AA58B6CF-E971-4C38-83DD-3FA609A439FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DF2D5CE-63FE-4ED2-AB89-D514DD91D0D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DF2D5CE-63FE-4ED2-AB89-D514DD91D0D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DF2D5CE-63FE-4ED2-AB89-D514DD91D0D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DF2D5CE-63FE-4ED2-AB89-D514DD91D0D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA58B6CF-E971-4C38-83DD-3FA609A439FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA58B6CF-E971-4C38-83DD-3FA609A439FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA58B6CF-E971-4C38-83DD-3FA609A439FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA58B6CF-E971-4C38-83DD-3FA609A439FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A223BB2-E777-410F-90B4-235EC1BD7E93}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://thalliscs.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = GeekBurguer.Ingredients\\GeekBurguer.Ingredients.csproj
+		SccProjectName1 = GeekBurguer.Ingredients
+		SccLocalPath1 = GeekBurguer.Ingredients
+		SccProjectUniqueName2 = GeekBurguer.Ingredients.Contracts\\GeekBurguer.Ingredients.Contracts.csproj
+		SccProjectName2 = GeekBurguer.Ingredients.Contracts
+		SccLocalPath2 = GeekBurguer.Ingredients.Contracts
+	EndGlobalSection
+EndGlobal
