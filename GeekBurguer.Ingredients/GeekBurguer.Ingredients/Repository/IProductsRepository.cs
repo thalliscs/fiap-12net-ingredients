@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GeekBurger.LabelLocader.Contract.Models;
 using GeekBurguer.Ingredients.Model;
 
 namespace GeekBurguer.Ingredients.Repository
@@ -11,5 +12,6 @@ namespace GeekBurguer.Ingredients.Repository
         void Save();
         List<Product> ListAllProducts();
         List<Product> ListProductByStoreId(Guid storeId);
+        void MergeProductsAndIngredients(Produto newItem);
     }
 }

@@ -20,5 +20,11 @@ namespace GeekBurguer.Ingredients.Model
         {
 
         }
+
+        public void AddIngredients(List<string> lstIngredients)
+        {
+            lstIngredients.ForEach(ingredient =>
+                Ingredients.Add(new Ingredient() { Name = ingredient }));
+        }
     }
 }
