@@ -23,7 +23,12 @@ namespace GeekBurguer.Ingredients
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var mvcCoreBuilder = services.AddMvc();
+            var mvcCoreBuilder = services.AddMvcCore();
+
+            mvcCoreBuilder
+                .AddFormatterMappings()
+                .AddJsonFormatters()
+                .AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ingredients", Version = "v1" });
