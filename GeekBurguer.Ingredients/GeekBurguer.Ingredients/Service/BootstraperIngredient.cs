@@ -3,6 +3,7 @@ using GeekBurger.Products.Contract;
 using GeekBurguer.Ingredients.Client;
 using GeekBurguer.Ingredients.Model;
 using GeekBurguer.Ingredients.Repository;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace GeekBurguer.Ingredients.Service
         private IProductsRepository _productRepository;
         private List<Product> _productsMocked;
         private ILogService _logService;
+        private IConfiguration _configuration;
 
         public BootstraperIngredient(IMapper mapper, IStoreRepository storeRepository, IProductsRepository productRepository, ILogService logService)
         {
@@ -26,6 +28,7 @@ namespace GeekBurguer.Ingredients.Service
             _productRepository = productRepository;
             _productsMocked = new List<Product>();
             _logService = logService;
+          
         }
 
         public void InitializeIngredients()
