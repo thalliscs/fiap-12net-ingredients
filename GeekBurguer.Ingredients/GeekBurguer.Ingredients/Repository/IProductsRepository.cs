@@ -7,12 +7,9 @@ namespace GeekBurguer.Ingredients.Repository
     public interface IProductsRepository
     {
         Product GetProductById(Guid productId);
-        List<Item> GetFullListOfItems();
-        bool Add(Product product);
-        bool Update(Product product);
-        IEnumerable<Product> GetProductsByStoreName(string storeName);
-        void Delete(Product product);
+        void Add(Product product);
         void Save();
-        List<Product> GetAllProducts();
+        List<Product> ListAllProducts();
+        List<Product> ListProductByStoreId(Guid storeId);
     }
 }

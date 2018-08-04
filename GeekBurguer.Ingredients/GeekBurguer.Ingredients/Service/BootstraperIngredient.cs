@@ -26,29 +26,34 @@ namespace GeekBurguer.Ingredients.Service
             _productsMocked = new List<Product>();
         }
 
-
         public void InitializeIngredients()
         {
             var stories = _storeRepository.GetAll();
 
             stories.ForEach(async store =>
             {
-                var response = ProductsApiClient.Current.GetProductsByStoreName(store.Name);
-
-                if (response.Result.IsSuccessStatusCode)
+                try
                 {
-                    string result = await response.Result.Content.ReadAsStringAsync();
-                    var products = JsonConvert.DeserializeObject<List<ProductToGet>>(result);
-                    PersistirProductsByStoreNameInMemory(products);
+                    var response = ProductsApiClient.Current.GetProductsByStoreName(store.Name);
+
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        string result = await response.Result.Content.ReadAsStringAsync();
+                        var products = JsonConvert.DeserializeObject<List<ProductToGet>>(result);
+                        PersistirProductsByStoreNameInMemory(products);
+                    }
+                    else
+                    {
+                        if (!_productsMocked.Any())
+                            PopularInMemoryProductsMocked();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     if (!_productsMocked.Any())
                         PopularInMemoryProductsMocked();
                 }
             });
-
-            _productRepository.GetAllProducts();
         }
 
         private void PopularInMemoryProductsMocked()
@@ -68,9 +73,8 @@ namespace GeekBurguer.Ingredients.Service
         {
             foreach (var product in products)
             {
-                //TODO: Resolve erro automapper
-                //var productEntity = Mapper.Map<ProductToGet, Product>(product);
-                _productRepository.Add(new Product());
+                var productEntity = Mapper.Map<ProductToGet, Product>(product);
+                _productRepository.Add(productEntity);
             }
         }
     }

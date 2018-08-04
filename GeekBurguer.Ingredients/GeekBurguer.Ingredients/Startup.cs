@@ -26,6 +26,7 @@ namespace GeekBurguer.Ingredients
             var mvcCoreBuilder = services.AddMvcCore();
 
             mvcCoreBuilder
+                .AddApiExplorer()
                 .AddFormatterMappings()
                 .AddJsonFormatters()
                 .AddCors();
