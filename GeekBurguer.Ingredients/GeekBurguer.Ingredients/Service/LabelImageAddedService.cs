@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GeekBurger.LabelLocader.Contract.Models;
+using GeekBurger.LabelLoader.Contract.Models;
 using GeekBurguer.Ingredients.Repository;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;

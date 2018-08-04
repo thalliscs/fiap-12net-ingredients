@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GeekBurger.LabelLocader.Contract.Models;
+using GeekBurger.LabelLoader.Contract.Models;
 using GeekBurguer.Ingredients.Model;
 
 namespace GeekBurguer.Ingredients.Repository

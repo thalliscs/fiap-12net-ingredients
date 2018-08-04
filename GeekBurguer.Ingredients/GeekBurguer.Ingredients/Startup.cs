@@ -42,6 +42,7 @@ namespace GeekBurguer.Ingredients
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IBootstraperIngredient, BootstraperIngredient>();
             services.AddScoped<ILabelImageAddedService, LabelImageAddedService>();
+            services.AddSingleton<ILogService, LogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using GeekBurguer.Ingredients.Model;
-using GeekBurger.LabelLocader.Contract.Models;
+using GeekBurger.LabelLoader.Contract.Models;
 
 namespace GeekBurguer.Ingredients.Repository
 {
@@ -47,6 +47,7 @@ namespace GeekBurguer.Ingredients.Repository
         {
             return _context.Products?
                 .Include(product => product.Items)
+                .ThenInclude(x => x.Ingredients)
                 .Include(product => product.Store)
                 .Where(x => x.StoreId == storeId).ToList();
         }

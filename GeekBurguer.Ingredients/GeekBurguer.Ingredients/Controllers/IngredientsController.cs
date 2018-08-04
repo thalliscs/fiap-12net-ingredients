@@ -26,19 +26,21 @@ namespace GeekBurguer.Ingredients.Controllers
         [HttpPost]
         public IActionResult ByRestrictions([FromBody]IngredientsRestrictionsRequest req)
         {
-            var itensMocked = _productRepository.ListProductByStoreId(req.StoreId);
+            var productsByStore = _productRepository.ListProductByStoreId(req.StoreId);
 
-            if (itensMocked.Count <= 0)
-                return NotFound();
-
-            var productsMockedToGet = _mapper.Map<List<IngredientsRestrictionsResponse>>(itensMocked);
-            foreach (var productMocked in productsMockedToGet)
+            if (productsByStore.Any())
             {
-                productMocked.Ingredients.Add("soy mocked");
-                productMocked.Ingredients.Add("gluten mocked");
+                var products = _mapper.Map<List<IngredientsRestrictionsResponse>>(productsByStore);
+
+                var productsByRestriction =
+                    products.Where(product =>
+                    product.Ingredients.All(ingredient => !req.Restrictions.Contains(ingredient)));
+
+                if(productsByRestriction.Any())
+                    return Ok(productsByRestriction);
             }
-            
-            return Ok(productsMockedToGet);
+
+            return NotFound();
         }
     }
 }

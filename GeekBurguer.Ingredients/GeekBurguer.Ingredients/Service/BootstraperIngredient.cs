@@ -18,12 +18,14 @@ namespace GeekBurguer.Ingredients.Service
         private IStoreRepository _storeRepository;
         private IProductsRepository _productRepository;
         private List<Product> _productsMocked;
+        private ILogService _logService;
 
-        public BootstraperIngredient(IMapper mapper, IStoreRepository storeRepository, IProductsRepository productRepository)
+        public BootstraperIngredient(IMapper mapper, IStoreRepository storeRepository, IProductsRepository productRepository, ILogService logService)
         {
             _storeRepository = storeRepository;
             _productRepository = productRepository;
             _productsMocked = new List<Product>();
+            _logService = logService;
         }
 
         public void InitializeIngredients()
@@ -34,6 +36,8 @@ namespace GeekBurguer.Ingredients.Service
             {
                 try
                 {
+                    _logService.SendMessagesAsync($"InitializeIngredients GetProductsByStoreName {store.Name}");
+
                     var response = ProductsApiClient.Current.GetProductsByStoreName(store.Name);
 
                     if (response.Result.IsSuccessStatusCode)
@@ -41,6 +45,8 @@ namespace GeekBurguer.Ingredients.Service
                         string result = await response.Result.Content.ReadAsStringAsync();
                         var products = JsonConvert.DeserializeObject<List<ProductToGet>>(result);
                         PersistirProductsByStoreNameInMemory(products);
+
+                        _logService.SendMessagesAsync($"InitializeIngredients SaveProductsInMemory with Success");
                     }
                     else
                     {
@@ -67,6 +73,8 @@ namespace GeekBurguer.Ingredients.Service
                 if (_productRepository.GetProductById(product.ProductId) == null)
                     _productRepository.Add(product);
             }
+
+            _logService.SendMessagesAsync($"InitializeIngredients PopularInMemoryProductsMocked");
         }
 
         private void PersistirProductsByStoreNameInMemory(List<ProductToGet> products)
