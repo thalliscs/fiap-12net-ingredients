@@ -65,7 +65,7 @@ namespace GeekBurguer.Ingredients
 
             ingredientsContext.Seed();
             boostraperIngredient.InitializeIngredients();
-            labelImageAddedService.ReceiveAsync();
+            labelImageAddedService.ReceiveMessages();
         }
     }
 }

@@ -7,6 +7,6 @@ namespace GeekBurguer.Ingredients.Service
 {
     public interface ILabelImageAddedService
     {
-        void ReceiveAsync();
+        void ReceiveMessages();
     }
 }
