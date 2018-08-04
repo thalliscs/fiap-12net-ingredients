@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GeekBurger.Products.Contract;
+using GeekBurguer.Ingredients.Contracts;
 using GeekBurguer.Ingredients.Model;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -9,8 +10,10 @@ namespace GeekBurguer.Ingredients.Helper
     {
         public AutoMapperProfile()
         {
-            CreateMap<Product, ProductToGet>();
-            CreateMap<Item, ItemToGet>();
+            CreateMap<Product, ProductToGet>().ReverseMap();
+            CreateMap<Item, ItemToGet>().ReverseMap();
+            CreateMap<Product, IngredientsRestrictionsResponse>().ReverseMap();
+            
         }
     }
 }
