@@ -40,10 +40,13 @@ namespace GeekBurguer.Ingredients
             services.AddScoped<IProductsRepository, ProductsRepository>();
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IBootstraperIngredient, BootstraperIngredient>();
+            services.AddScoped<ILabelImageAddedService, LabelImageAddedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IngredientsContext ingredientsContext, IBootstraperIngredient boostraperIngredient)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+            IngredientsContext ingredientsContext, IBootstraperIngredient boostraperIngredient,
+            ILabelImageAddedService labelImageAddedService)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +63,7 @@ namespace GeekBurguer.Ingredients
 
             ingredientsContext.Seed();
             boostraperIngredient.InitializeIngredients();
+            labelImageAddedService.ReceiveAsync();
         }
     }
 }
