@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore;
+using GeekBurguer.Ingredients.Repository;
+using AutoMapper;
+using GeekBurguer.Ingredients.Extension;
+using GeekBurguer.Ingredients.Service;
 
 namespace GeekBurguer.Ingredients
 {
@@ -20,23 +20,25 @@ namespace GeekBurguer.Ingredients
             Configuration = configuration;
         }
 
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var mvcCoreBuilder = services.AddMvc();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "Ingredients",
-                    Version = "v1"
-                });
+                c.SwaggerDoc("v1", new Info { Title = "Ingredients", Version = "v1" });
             });
+
+            services.AddAutoMapper();
+
+            services.AddDbContext<IngredientsContext>(o => o.UseInMemoryDatabase("geekburger-ingredients"));
+            services.AddScoped<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IStoreRepository, StoreRepository>();
+            services.AddScoped<IBootstraperIngredient, BootstraperIngredient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IngredientsContext ingredientsContext, IBootstraperIngredient boostraperIngredient)
         {
             if (env.IsDevelopment())
             {
@@ -51,6 +53,8 @@ namespace GeekBurguer.Ingredients
                "Ingredients");
             });
 
+            ingredientsContext.Seed();
+            boostraperIngredient.InitializeIngredients();
         }
     }
 }
