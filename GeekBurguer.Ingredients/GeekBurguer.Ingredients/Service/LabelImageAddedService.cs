@@ -10,27 +10,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
+using GeekBurguer.Ingredients.Model;
 
 namespace GeekBurguer.Ingredients.Service
 {
     public class LabelImageAddedService : ILabelImageAddedService
     {
-        private IQueueClient _queueClient;
+        private ISubscriptionClient _subscriptionClient;
         private IConfiguration _configuration;
-        private IProductsRepository _productRepository;
         private IMapper _mapper;
+        private ServiceBusConfiguration _serviceBusConfiguration;
         private string TopicName = "LabelImageAdded";
         private string SubscriptionName = "IngredientsSubscription";
 
-        public LabelImageAddedService(IMapper mapper, IProductsRepository productRepository)
+        public LabelImageAddedService(IMapper mapper)
         {
-            _productRepository = productRepository;
             _mapper = mapper;
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
+            _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+            _serviceBusConfiguration = _configuration.GetSection("serviceBus").Get<ServiceBusConfiguration>();
+            EnsureSubscriptionCreated();        }
 
+        private void EnsureSubscriptionCreated()
+        {
             var serviceBusNamespace = _configuration.GetServiceBusNamespace();
 
             if (!serviceBusNamespace.Topics.List().Any(anyTopic => anyTopic.Name.Equals(TopicName,
@@ -41,22 +43,21 @@ namespace GeekBurguer.Ingredients.Service
 
             var topic = serviceBusNamespace.Topics.GetByName(TopicName);            if (!topic.Subscriptions.List().Any(subscription => subscription.Name.Equals(SubscriptionName,
                     StringComparison.InvariantCultureIgnoreCase)))
-                topic.Subscriptions.Define(SubscriptionName).Create();        }
+                topic.Subscriptions.Define(SubscriptionName).Create();
+        }
 
-        public async void ReceiveMessages()
+        public async Task ReceiveMessages()
         {
-            var config = _configuration.GetSection("serviceBus").Get<ServiceBusConfiguration>();
-            var subscriptionClient = new SubscriptionClient(config.ConnectionString, TopicName, SubscriptionName);
+            try
+            {
+                _subscriptionClient = new SubscriptionClient(_serviceBusConfiguration.ConnectionString, TopicName, SubscriptionName);
 
-            //TEST - MergeProductsAndIngredients
-            //var produto = new System.Collections.Generic.List<string>();
-            //produto.Add("teste01");
-            //_productRepository.MergeProductsAndIngredients(new Produto() { ItemName = "beef", Ingredients = produto });
-            //produto.Add("teste02");
-            //_productRepository.MergeProductsAndIngredients(new Produto() { ItemName = "beef", Ingredients = produto });
-
-            subscriptionClient.RegisterMessageHandler(MessageHandler,
-                new MessageHandlerOptions(ExceptionHandle) { AutoComplete = true });
+                _subscriptionClient.RegisterMessageHandler(MessageHandler, 
+                    new MessageHandlerOptions(ExceptionHandle) { AutoComplete = true, MaxConcurrentCalls = 3 });
+            }
+            catch
+            {
+            }
         }
         private static Task ExceptionHandle(ExceptionReceivedEventArgs arg)
         {
@@ -66,12 +67,37 @@ namespace GeekBurguer.Ingredients.Service
 
         private async Task MessageHandler(Message message, CancellationToken cancellationToken)
         {
+            if (_subscriptionClient.IsClosedOrClosing)
+                return;
+
             var labelImageAddedString = Encoding.UTF8.GetString(message.Body);
-            var labelImageAdded = JsonConvert.DeserializeObject<Produto>(labelImageAddedString);
+            var responseItens = JsonConvert.DeserializeObject<List<Produto>>(labelImageAddedString);
 
-            _productRepository.MergeProductsAndIngredients(labelImageAdded);
+            foreach (var responseItem in responseItens)
+            {
+                using (var context = new IngredientsContext())
+                {
+                    var productRepository = new ProductsRepository(context);
+                    var itemsWithIngredient = productRepository.ListProductByIngredientName(responseItem.ItemName);
 
-            await _queueClient.CompleteAsync(message.SystemProperties.LockToken);
+                    if (itemsWithIngredient.Any())
+                    {
+                        itemsWithIngredient.ForEach(x =>
+                        {
+                            x.Ingredients.Clear();
+                            x.Ingredients.AddRange(responseItem.Ingredients.Select(ingredient => new Ingredient
+                            {
+                                ItemId = x.ItemId,
+                                Name = ingredient
+                            }));
+
+                            productRepository.Save();
+                        });
+                    }
+                }
+            }
+
+            await Task.CompletedTask;
         }
     }
 }

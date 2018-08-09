@@ -26,21 +26,29 @@ namespace GeekBurguer.Ingredients.Controllers
         [HttpPost]
         public IActionResult ByRestrictions([FromBody]IngredientsRestrictionsRequest req)
         {
-            var productsByStore = _productRepository.ListProductByStoreId(req.StoreId);
+            var itemsByStore = _productRepository.ListItemsByStoreId(req.StoreId);
 
-            if (productsByStore.Any())
+            if (itemsByStore.Any())
             {
-                var products = _mapper.Map<List<IngredientsRestrictionsResponse>>(productsByStore);
+                var itemsWithRestriction =
+                    itemsByStore.Where(item => item.Ingredients.All(ingredient => !req.Restrictions.Contains(ingredient.Name)));
 
-                var productsByRestriction =
-                    products.Where(product =>
-                    product.Ingredients.All(ingredient => !req.Restrictions.Contains(ingredient)));
+                var responseRestrictionIngredients = MapResponseRestrictionItems(itemsWithRestriction);
 
-                if(productsByRestriction.Any())
-                    return Ok(productsByRestriction);
+                if (responseRestrictionIngredients.Any())
+                    return Ok(responseRestrictionIngredients);
             }
 
             return NotFound();
+        }
+
+        private static IEnumerable<IngredientsRestrictionsResponse> MapResponseRestrictionItems(IEnumerable<Item> itemsWithRestriction)
+        {
+            return itemsWithRestriction.Select(x => new IngredientsRestrictionsResponse
+            {
+                ProductId = x.Product.ProductId,
+                Ingredients = x.Ingredients.Select(ingredient => ingredient.Name).ToList()
+            });
         }
     }
 }

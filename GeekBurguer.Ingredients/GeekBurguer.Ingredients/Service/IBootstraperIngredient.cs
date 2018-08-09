@@ -4,6 +4,6 @@ namespace GeekBurguer.Ingredients.Service
 {
     public interface IBootstraperIngredient
     {
-        void InitializeIngredients();
+        Task InitializeIngredients();
     }
 }

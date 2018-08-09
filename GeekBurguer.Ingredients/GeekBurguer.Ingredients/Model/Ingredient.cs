@@ -13,12 +13,8 @@ namespace GeekBurguer.Ingredients.Model
         public Guid IngredientId { get; set; }
         public string Name { get; set; }
 
+        public Guid ItemId { get; set; }
         [ForeignKey("ItemId")]
         public Item Item { get; set; }
-
-        public Ingredient()
-        {
-
-        }
     }
 }

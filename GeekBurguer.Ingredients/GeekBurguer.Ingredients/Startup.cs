@@ -8,6 +8,8 @@ using GeekBurguer.Ingredients.Repository;
 using AutoMapper;
 using GeekBurguer.Ingredients.Extension;
 using GeekBurguer.Ingredients.Service;
+using System.Threading.Tasks;
+using System;
 
 namespace GeekBurguer.Ingredients
 {
@@ -21,7 +23,7 @@ namespace GeekBurguer.Ingredients
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public async void ConfigureServices(IServiceCollection services)
         {
             var mvcCoreBuilder = services.AddMvcCore();
 
@@ -37,25 +39,38 @@ namespace GeekBurguer.Ingredients
 
             services.AddAutoMapper();
 
-            services.AddDbContext<IngredientsContext>(o => o.UseInMemoryDatabase("geekburger-ingredients"));
+            services.AddScoped<IngredientsContext>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
             services.AddScoped<IStoreRepository, StoreRepository>();
-            services.AddScoped<IBootstraperIngredient, BootstraperIngredient>();
-            services.AddScoped<ILabelImageAddedService, LabelImageAddedService>();
+            services.AddSingleton<ILabelImageAddedService, LabelImageAddedService>();
+            services.AddSingleton<IBootstraperIngredient, BootstraperIngredient>();
             services.AddSingleton<ILogService, LogService>();
+
+            await InitializeIngredients(services);
+
+             services.AddMvc();
+        }
+
+        private async Task InitializeIngredients(IServiceCollection services)
+        {
+            IServiceProvider provider = services.BuildServiceProvider();
+            var boostraperIngredient = provider.GetService<IBootstraperIngredient>();
+            var labelImageAddedService = provider.GetService<ILabelImageAddedService>();
+            var ingredientsContext = provider.GetService<IngredientsContext>();
+            ingredientsContext.Seed();
+
+            await boostraperIngredient.InitializeIngredients();
+            await labelImageAddedService.ReceiveMessages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            IngredientsContext ingredientsContext, IBootstraperIngredient boostraperIngredient,
-            ILabelImageAddedService labelImageAddedService)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -63,9 +78,7 @@ namespace GeekBurguer.Ingredients
                "Ingredients");
             });
 
-            ingredientsContext.Seed();
-            boostraperIngredient.InitializeIngredients();
-            labelImageAddedService.ReceiveMessages();
+            app.UseMvc();
         }
     }
 }

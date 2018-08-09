@@ -31,7 +31,7 @@ namespace GeekBurguer.Ingredients.Service
           
         }
 
-        public void InitializeIngredients()
+        public async Task InitializeIngredients()
         {
             var stories = _storeRepository.GetAll();
 

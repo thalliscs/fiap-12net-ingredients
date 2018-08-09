@@ -11,7 +11,7 @@ namespace GeekBurguer.Ingredients.Repository
         void Add(Product product);
         void Save();
         List<Product> ListAllProducts();
-        List<Product> ListProductByStoreId(Guid storeId);
-        void MergeProductsAndIngredients(Produto newItem);
+        List<Item> ListItemsByStoreId(Guid storeId);
+        List<Item> ListProductByIngredientName(string name);
     }
 }

@@ -11,22 +11,11 @@ namespace GeekBurguer.Ingredients.Model
         public Guid ItemId { get; set; }
         public string Name { get; set; }
 
-        public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+        public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
 
-        public Item()
-        {
-
-        }
-
-        public void AddIngredients(List<string> lstIngredients)
-        {
-            Ingredients.Clear();
-
-            lstIngredients.ForEach(ingredient =>
-                Ingredients.Add(new Ingredient() { Name = ingredient }));
-        }
+     
     }
 }

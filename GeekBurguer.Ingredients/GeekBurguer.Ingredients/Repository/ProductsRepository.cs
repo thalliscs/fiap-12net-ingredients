@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using GeekBurguer.Ingredients.Model;
-using GeekBurger.LabelLoader.Contract.Models;
 
 namespace GeekBurguer.Ingredients.Repository
 {
@@ -12,10 +11,7 @@ namespace GeekBurguer.Ingredients.Repository
     {
         private IngredientsContext _context;
 
-        public ProductsRepository(IngredientsContext context)
-        {
-            _context = context;
-        }
+        public ProductsRepository(IngredientsContext context) => _context = context;
 
         public Product GetProductById(Guid productId)
         {
@@ -43,23 +39,25 @@ namespace GeekBurguer.Ingredients.Repository
                 .ToList();
         }
 
-        public List<Product> ListProductByStoreId(Guid storeId)
+        public List<Item> ListItemsByStoreId(Guid storeId)
         {
-            return _context.Products?
-                .Include(product => product.Items)
-                .ThenInclude(x => x.Ingredients)
-                .Include(product => product.Store)
-                .Where(x => x.StoreId == storeId).ToList();
+            return _context.Items?
+                .Include(x=>x.Ingredients)
+                .Include(x => x.Product)
+                .ThenInclude(x=>x.Store)
+                .Where(x => x.Product.StoreId == storeId).ToList();
         }
 
-        public void MergeProductsAndIngredients(Produto newItem)
+        public List<Item> ListProductByIngredientName(string name)
         {
-            if (newItem != null)
-                ListAllProducts().ForEach(product =>
-                    product.Items.Where(items => items.Name == newItem.ItemName).ToList()
-                        .ForEach(item => item.AddIngredients(newItem.Ingredients)));
+            List<Item>  items = _context.Items?
+              .Include(item => item.Ingredients).Where(ingredient => ingredient.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            return items;
+        }
 
-            _context.SaveChanges();
+        public Item GetItemById(Guid itemId)
+        {
+            return _context.Items?.Include(item => item.Ingredients).FirstOrDefault(x => x.ItemId == itemId);
         }
     }
 }
