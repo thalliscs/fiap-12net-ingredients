@@ -20,15 +20,18 @@ namespace GeekBurguer.Ingredients.Service
         private ISubscriptionClient _subscriptionClient;
         private IConfiguration _configuration;
         private IMapper _mapper;
+        private ILogService _logService;
+
         private ServiceBusConfiguration _serviceBusConfiguration;
         private string TopicName = "LabelImageAdded";
         private string SubscriptionName = "IngredientsSubscription";
 
-        public LabelImageAddedService(IMapper mapper)
+        public LabelImageAddedService(IMapper mapper, ILogService logService)
         {
             _mapper = mapper;
             _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
             _serviceBusConfiguration = _configuration.GetSection("serviceBus").Get<ServiceBusConfiguration>();
+            _logService = logService;
             EnsureSubscriptionCreated();        }
 
         private void EnsureSubscriptionCreated()
@@ -70,6 +73,8 @@ namespace GeekBurguer.Ingredients.Service
             if (_subscriptionClient.IsClosedOrClosing)
                 return;
 
+            _logService.SendMessagesAsync("LabelImageAddedService consumindo topico");
+
             var labelImageAddedString = Encoding.UTF8.GetString(message.Body);
             var responseItens = JsonConvert.DeserializeObject<List<Produto>>(labelImageAddedString);
 
@@ -88,7 +93,7 @@ namespace GeekBurguer.Ingredients.Service
                             x.Ingredients.AddRange(responseItem.Ingredients.Select(ingredient => new Ingredient
                             {
                                 ItemId = x.ItemId,
-                                Name = ingredient
+                                Name = ingredient.ToUpper()
                             }));
 
                             productRepository.Save();
@@ -96,6 +101,8 @@ namespace GeekBurguer.Ingredients.Service
                     }
                 }
             }
+
+            _logService.SendMessagesAsync("LabelImageAddedService consumido com sucesso");
 
             await Task.CompletedTask;
         }

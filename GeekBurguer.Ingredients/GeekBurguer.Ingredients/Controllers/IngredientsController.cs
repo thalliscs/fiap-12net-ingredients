@@ -30,8 +30,8 @@ namespace GeekBurguer.Ingredients.Controllers
 
             if (itemsByStore.Any())
             {
-                var itemsWithRestriction =
-                    itemsByStore.Where(item => item.Ingredients.All(ingredient => !req.Restrictions.Contains(ingredient.Name)));
+                var itemsWithRestriction = 
+                    itemsByStore.Where(item => item.Ingredients.All(ingredient => !req.Restrictions.Any(x=> ingredient.Name.ToUpper().Contains(x.ToUpper()))));
 
                 var responseRestrictionIngredients = MapResponseRestrictionItems(itemsWithRestriction);
 
